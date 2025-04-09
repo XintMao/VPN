@@ -16,8 +16,7 @@ public class NetPipeServer {
     private static Arguments arguments;
     private static HandshakeCrypto privateKey;
     private static SessionKey sessionKey;
-    //private static byte[] iv;
-
+ 
     private static SessionCipher sessionCipher;
     private static HandshakeMessage sessionMessage;
     private static HandshakeMessage clientHello;
@@ -38,7 +37,7 @@ public class NetPipeServer {
                 System.out.println("Server listening on port " + port);
                 socket = serverSocket.accept();
 
-                // 握手过程：逐步拆分逻辑
+                // 握手过程
                 checkClientHello(socket, netCert, netDigest);
                 sendServerHello(socket, netCert, netDigest);
                 handleSession(socket, netDigest);
@@ -81,14 +80,14 @@ public class NetPipeServer {
             arguments.setArgumentSpec("cacert", "filename");
             arguments.setArgumentSpec("key", "filename");
         } catch (IllegalArgumentException e) {
-            usage(); // 提示用法并退出程序
+            usage();
         }
     }
 
 
     private static void usage() {
         System.err.println("Usage: java NetPipeServer --port=<port> --usercert=<path> --cacert=<path> --key=<path>");
-        System.exit(1); // 退出程序
+        System.exit(1); 
     }
 
 
@@ -103,7 +102,7 @@ public class NetPipeServer {
         if (clientHello == null || clientHello.getType() != HandshakeMessage.MessageType.CLIENTHELLO) {
             throw new Exception("Invalid message type received. Expected CLIENTHELLO.");
         }
-        // 验证并加载客户端证书
+        
         netCert.setClientCert(CertificateManager.loadVerifiedCACertificate(clientHello.getParameter("Certificate"), netCert.getCaCert(), "client-np.ik2206.kth.se"));
         // 初始化客户端加密对象
         netDigest.setClientCrypto(new HandshakeCrypto(netCert.getClientCert()));
@@ -165,7 +164,6 @@ public class NetPipeServer {
         sessionKey = new SessionKey(sessionKeyBytes);
         sessionCipher = new SessionCipher(sessionKey, ivBytes);
 
-        // 更新消息摘要
         netDigest.getClientDigest().update(sessionMessage.getBytes());
 
         //  System.out.println("SERVER: Session key and IV successfully decrypted and session cipher initialized.");
