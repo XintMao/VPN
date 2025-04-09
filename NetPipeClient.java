@@ -26,7 +26,6 @@ public class NetPipeClient {
         try {
             NetCert netCert = new NetCert();
             NetDigest netDigest = new NetDigest();
-            // 解析命令行参数
             parseArgs(args);
 
             // 加载证书和私钥
@@ -43,7 +42,7 @@ public class NetPipeClient {
             int port = Integer.parseInt(arguments.get("port"));
 
             // 创建 Socket 连接
-            socket = new Socket(host, port); // 静态变量赋值
+            socket = new Socket(host, port); 
             //  System.out.println("Connected to server: " + host + ":" + port);
 
             // 执行握手过程
@@ -102,7 +101,7 @@ public class NetPipeClient {
         arguments.setArgumentSpec("key", "client private key file");
 
         try {
-            // 加载命令行参数
+            
             arguments.loadArguments(args);
 
         } catch (IllegalArgumentException e) {
@@ -121,7 +120,6 @@ public class NetPipeClient {
         Base64.Encoder encoder = Base64.getEncoder();
         String certB64 = encoder.encodeToString(netCert.getClientCert().getBytes());
         clientHello.putParameter("Certificate", certB64);
-        // 调试信息
         //("DEBUG: CLIENTHELLO Message Bytes: " + Arrays.toString(clientHello.getBytes()));
         clientHello.send(socket);
         netDigest.setClientDigest(new HandshakeDigest());
@@ -164,7 +162,7 @@ public class NetPipeClient {
     private static void sendClientFinished(Socket socket, NetDigest netDigest) throws Exception {
         HandshakeMessage clientFinished = new HandshakeMessage(HandshakeMessage.MessageType.CLIENTFINISHED);
 
-        // 调用工具类方法，传递 socket 参数
+        // 传递 socket 参数
         sendFinishedMessage(clientFinished, netDigest.getClientDigest(), netDigest.getClientCrypto(), socket);
 
     }
